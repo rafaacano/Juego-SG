@@ -1,0 +1,3 @@
+Deshabilitar el update propio de la cámara y hacer uno nuevo.
+
+Obtener la posición del objeto en vez de incrementar en 0.2 la posición de la cámara, por si cambia el objeto.
