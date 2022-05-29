@@ -6,12 +6,15 @@ import { Stats } from '../libs/stats.module.js'
 import * as TWEEN from '../libs/tween.esm.js'
 
 import { Caja } from './Caja.js'
-import { Nave } from './Nave.js'
+
 
 // Variables
 var cubos = new Array;
 var pinchos = new Array;
-var salto = new Boolean(true);
+var saltoCubo = new Boolean(true);
+var movNave = new Boolean(false);
+var saltoCirculo = new Boolean(false);
+var cambioCirculo = new Boolean(true);
 
 /// La clase fachada del modelo
 /**
@@ -20,9 +23,6 @@ var salto = new Boolean(true);
  class MyScene extends THREE.Scene {
     // Tendremos una variable que nos contará el número de intentos
     static attempts = 0;
-
-    // booleano para controlar la animacion
-    
 
     constructor (myCanvas) {
       super();
@@ -59,14 +59,9 @@ var salto = new Boolean(true);
       // Por último creamos el modelo.
       // El modelo puede incluir su parte de la interfaz gráfica de usuario. Le pasamos la referencia a 
       // la gui y el texto bajo el que se agruparán los controles de la interfaz que añada el modelo.
-      this.model = new Caja(this.gui, "Controles de la caja ");
-      //this.model = new Nave(this.gui, "Controles de la Caja");
+      this.model = new Caja(this.gui, "Controles de la Caja");
       this.add (this.model);
       this.model.position.set(-300,1,0);
-
-      // Vectores para la deteccion de colisiones
-      this.posCubo = new THREE.Vector3();
-      this.posObstaculos = new THREE.Vector3();
 
       // Tendremos una cámara con un control de movimiento con el ratón
       this.createCamera ();
@@ -139,7 +134,7 @@ var salto = new Boolean(true);
     createRoof () {
       // El suelo es un Mesh, necesita una geometría y un material.
       // La geometría es una caja con muy poca altura
-      var geometryWall = new THREE.BoxGeometry (300,0.2,250);
+      var geometryWall = new THREE.BoxGeometry (700,0.2,250);
       
       // El material se hará con una textura de madera
       var texture = new THREE.TextureLoader().load('../imgs/ladrillo-mapaNormal.png');
@@ -149,13 +144,13 @@ var salto = new Boolean(true);
       var roof = new THREE.Mesh (geometryWall, materialGround);
       
       // Colocamos el techo al final del mapa (solo es para el último objeto)
-      roof.position.set(300,25,0);
+      roof.position.set(0,25,0);
 
       // Que no se nos olvide añadirlo a la escena, que en este caso es  this
       this.add (roof);
 
       // Creamos los obstaculos
-      //this.crearObstaculosRoof();
+      this.crearObstaculosRoof();
     }
 
     createWall(){
@@ -319,16 +314,18 @@ var salto = new Boolean(true);
       // Se actualiza la posición de la cámara según la posición del modelo
       this.camera.position.x = this.model.getPosX();
 
-      //Cambio de objeto del juego
-
-      if(this.model.getPosX() > -250 && this.model.getPosX() < -200){
+      // Cambio de los objetos del juego
+      if(this.model.getPosX() > -67 && this.model.getPosX() < 166){
         this.model.cambioCajaNave();
+        saltoCubo = false;
+        movNave = true;
       }
 
-      if(this.model.getPosX() > -200){
+      if(this.model.getPosX() > 167){
         this.model.cambioNaveRueda();
+        movNave = false;
+        saltoCirculo = true;
       }
-      
 
       // Se actualiza el resto del modelo
       this.model.update();
@@ -356,39 +353,33 @@ var salto = new Boolean(true);
       var x = event.which;
 
       // Si pulsamos el espacio, saltamos
-      if( (String.fromCharCode(x) == " ") && (salto == true) ){
+      if( String.fromCharCode(x) == " " && saltoCubo == true ){
         this.saltar(this.model.position.x,this.model.position.y,this.model.position.z);
-        //alert("Espacio pulsado");
       }
-      if( (String.fromCharCode(x) == "W") || (String.fromCharCode(x) == "w") ){
+      if( ((String.fromCharCode(x) == "W") || (String.fromCharCode(x) == "w")) && movNave == true ){
         this.moverArriba();
         
       }
-      if( (String.fromCharCode(x) == "S") || (String.fromCharCode(x) == "s") ){
+      if( ((String.fromCharCode(x) == "S") || (String.fromCharCode(x) == "s"))  && movNave == true){
          this.moverAbajo();
       }
-    }
-
-    moverArriba(){
-      this.model.position.y += 0.5;
-      if(this.model.position.y > 24){
-        this.model.position.y = 24;
+      // Si pulsamos el espacio, saltamos
+      if( String.fromCharCode(x) == " " && saltoCirculo == true ){
+        this.cambio(this.model.position.x,this.model.position.y,this.model.position.z);
       }
-    }
 
-    moverAbajo(){
-      this.model.position.y -= 0.5;
-      if(this.model.position.y < 1){
-        this.model.position.y = 1;
-      }
     }
 
     onMouseDown(event){
       var x = event.which;
 
       // Si pulsamos el boton izquierdo del ratón
-      if( x == 1 ){
+      if( x == 1 && saltoCubo == true ){
         this.saltar(this.model.position.x,this.model.position.y,this.model.position.z);
+      }
+      else if( x == 1 && saltoCirculo == true){
+        this.cambio(this.model.position.x,this.model.position.y,this.model.position.z);
+
       }
     }
 
@@ -399,6 +390,8 @@ var salto = new Boolean(true);
       // Serán cubos y conos
       var geomPincho = new THREE.ConeGeometry(1.5,2,3);
       var geomCubo = new THREE.BoxGeometry(2,2,2);
+      var geomCubox2 = new THREE.BoxGeometry(3,3,3);
+      var geomCubox3 = new THREE.BoxGeometry(4,4,4);
       var matObstaculos = new THREE.MeshPhongMaterial({color:0x8c004b});
   
       // Creamos tantos objetos como haya en el mapa
@@ -412,26 +405,26 @@ var salto = new Boolean(true);
       var cubo8= new THREE.Mesh(geomCubo,matObstaculos);
       var cubo9 = new THREE.Mesh(geomCubo,matObstaculos);
       var cubo10 = new THREE.Mesh(geomCubo,matObstaculos);
-      var cubo11 = new THREE.Mesh(geomCubo,matObstaculos);
-      var cubo12 = new THREE.Mesh(geomCubo,matObstaculos);
-      var cubo13 = new THREE.Mesh(geomCubo,matObstaculos);
-      var cubo14 = new THREE.Mesh(geomCubo,matObstaculos);
-      var cubo15 = new THREE.Mesh(geomCubo,matObstaculos);
-      var cubo16 = new THREE.Mesh(geomCubo,matObstaculos);
-      var cubo17 = new THREE.Mesh(geomCubo,matObstaculos);
-      var cubo18 = new THREE.Mesh(geomCubo,matObstaculos);
-      var cubo19 = new THREE.Mesh(geomCubo,matObstaculos);
-      var cubo20 = new THREE.Mesh(geomCubo,matObstaculos);
-      var cubo21 = new THREE.Mesh(geomCubo,matObstaculos);
-      var cubo22 = new THREE.Mesh(geomCubo,matObstaculos);
-      var cubo23 = new THREE.Mesh(geomCubo,matObstaculos);
-      var cubo24 = new THREE.Mesh(geomCubo,matObstaculos);
-      var cubo25 = new THREE.Mesh(geomCubo,matObstaculos);
-      var cubo26 = new THREE.Mesh(geomCubo,matObstaculos);
-      var cubo27 = new THREE.Mesh(geomCubo,matObstaculos);
-      var cubo28 = new THREE.Mesh(geomCubo,matObstaculos);
-      var cubo29 = new THREE.Mesh(geomCubo,matObstaculos);
-      var cubo30 = new THREE.Mesh(geomCubo,matObstaculos);
+      var cubo11 = new THREE.Mesh(geomCubox2,matObstaculos);
+      var cubo12 = new THREE.Mesh(geomCubox2,matObstaculos);
+      var cubo13 = new THREE.Mesh(geomCubox2,matObstaculos);
+      var cubo14 = new THREE.Mesh(geomCubox2,matObstaculos);
+      var cubo15 = new THREE.Mesh(geomCubox2,matObstaculos);
+      var cubo16 = new THREE.Mesh(geomCubox2,matObstaculos);
+      var cubo17 = new THREE.Mesh(geomCubox2,matObstaculos);
+      var cubo18 = new THREE.Mesh(geomCubox2,matObstaculos);
+      var cubo19 = new THREE.Mesh(geomCubox2,matObstaculos);
+      var cubo20 = new THREE.Mesh(geomCubox3,matObstaculos);
+      var cubo21 = new THREE.Mesh(geomCubox3,matObstaculos);
+      var cubo22 = new THREE.Mesh(geomCubox3,matObstaculos);
+      var cubo23 = new THREE.Mesh(geomCubox3,matObstaculos);
+      var cubo24 = new THREE.Mesh(geomCubox3,matObstaculos);
+      var cubo25 = new THREE.Mesh(geomCubox3,matObstaculos);
+      var cubo26 = new THREE.Mesh(geomCubox3,matObstaculos);
+      var cubo27 = new THREE.Mesh(geomCubox3,matObstaculos);
+      var cubo28 = new THREE.Mesh(geomCubox3,matObstaculos);
+      var cubo29 = new THREE.Mesh(geomCubox3,matObstaculos);
+      var cubo30 = new THREE.Mesh(geomCubox3,matObstaculos);
       var pincho = new THREE.Mesh(geomPincho,matObstaculos);
       var pincho2 = new THREE.Mesh(geomPincho,matObstaculos);
       var pincho3 = new THREE.Mesh(geomPincho,matObstaculos);
@@ -477,29 +470,26 @@ var salto = new Boolean(true);
 
       /******************************************************/
       // Obstaculos de la nave
-      cubo11.position.set(-50,4,0);
-      cubo12.position.set(-35,7,0);
-      cubo13.position.set(-22,3,0);
-      cubo14.position.set(-10,1,0);
+      cubo11.position.set(-46,10,0);
+      cubo12.position.set(-35,6,0);
+      cubo13.position.set(-22,17,0);
+      cubo14.position.set(-10,5,0);
       cubo15.position.set(2,8,0);
-      cubo16.position.set(44,4,0);
-      cubo17.position.set(42,2,0);
-      cubo18.position.set(40,6,0);
-      cubo19.position.set(60,5,0);
-      cubo20.position.set(90,1,0);
+      cubo16.position.set(26,17,0);
+      cubo17.position.set(40,5,0);
+      cubo18.position.set(44,6,0);
+      cubo19.position.set(60,15,0);
+      cubo20.position.set(90,11,0);
       cubo21.position.set(105,4,0);
       cubo22.position.set(112,7,0);
-      cubo23.position.set(124,1,0);
-      cubo24.position.set(124,6,0);
+      cubo23.position.set(124,17,0);
+      cubo24.position.set(124,12,0);
       cubo25.position.set(135,4,0);
-      cubo26.position.set(142,4,0);
-      cubo27.position.set(149,2,0);
+      cubo26.position.set(142,18,0);
+      cubo27.position.set(149,12,0);
       cubo28.position.set(156,6,0);
-      cubo29.position.set(165,5,0);
-      cubo30.position.set(174,1,0);
-
-      /*****************************************************/
-      // Obstaculos del objeto "pelota"
+      cubo29.position.set(165,15,0);
+      cubo30.position.set(174,10,0);
 
       // Añadimos cada objeto en su array para las colisiones
       pinchos.push(pincho);
@@ -616,7 +606,80 @@ var salto = new Boolean(true);
       var pincho20 = new THREE.Mesh(geomPincho,matObstaculos);
 
       // Los colocamos en su posición
+      cubo31.position.set(186,1,0);
+      cubo32.position.set(188,1,0);
+      pincho11.position.set(198,1,0);
+      pincho11.rotateY(Math.PI);
+      pincho12.position.set(205,20,0);
+      pincho12.rotateX(Math.PI);
+      pincho13.position.set(212,1,0);
+      pincho13.rotateY(Math.PI);
+      cubo33.position.set(215,1,0);
+      cubo34.position.set(230,20,0);
+      cubo35.position.set(236,1,0);
+      pincho14.position.set(246,20,0);
+      pincho14.rotateX(Math.PI);
+      pincho15.position.set(264,1,0);
+      pincho15.rotateY(Math.PI);
+      cubo36.position.set(274,20,0);
+      cubo37.position.set(280,1,0);
+      pincho16.position.set(296,20,0);
+      pincho16.rotateX(Math.PI);
+      cubo38.position.set(308,1,0);
+      pincho17.position.set(319,20,0);
+      pincho17.rotateX(Math.PI);
+      pincho18.position.set(330,1,0);
+      pincho18.rotateY(Math.PI);
+      cubo39.position.set(338,20,0);
+      //pincho19.position.set(339.5,1,0);
+      //cubo40.position.set(342,1,0);
+      pincho20.position.set(354,20,0);
+      pincho20.rotateX(Math.PI);
 
+      // Añadimos
+      cubos.push(cubo31);
+      cubos.push(cubo32);
+      cubos.push(cubo33);
+      cubos.push(cubo34);
+      cubos.push(cubo35);
+      cubos.push(cubo36);
+      cubos.push(cubo37);
+      cubos.push(cubo38);
+      cubos.push(cubo39);
+      cubos.push(cubo40);
+      pinchos.push(pincho11);
+      pinchos.push(pincho12);
+      pinchos.push(pincho13);
+      pinchos.push(pincho14);
+      pinchos.push(pincho15);
+      pinchos.push(pincho16);
+      pinchos.push(pincho17);
+      pinchos.push(pincho18);
+      pinchos.push(pincho19);
+      pinchos.push(pincho20);
+
+      // Los añadimos a la escena
+      this.add(cubo31);
+      this.add(cubo32);
+      this.add(cubo33);
+      this.add(cubo34);
+      this.add(cubo35);
+      this.add(cubo36);
+      this.add(cubo37);
+      this.add(cubo38);
+      this.add(cubo39);
+      this.add(cubo40);
+
+      this.add(pincho11);
+      this.add(pincho12);
+      this.add(pincho13);
+      this.add(pincho14);
+      this.add(pincho15);
+      this.add(pincho16);
+      this.add(pincho17);
+      this.add(pincho18);
+      this.add(pincho19);
+      this.add(pincho20);
     }
 
     /**************************************************************/
@@ -654,10 +717,12 @@ var salto = new Boolean(true);
 
     /**************************************************************/
     /**************************************************************/
+    // FUNCIONES DE LOS MOVIMIENTOS
     // Función para el salto de la caja
     saltar(x,y,z){
 
-      salto = false;
+      // Ponemos el salto a false
+      saltoCubo = false;
 
       // Creamos el camino por el que irá el objeto
       // El true hace que el camino sea cerrado
@@ -694,18 +759,114 @@ var salto = new Boolean(true);
       // Empezamos la animacion
       animacion.start();
 
+      // Ponemos el booleano a true
       animacion.onComplete(() => {
-        salto = true;
+        saltoCubo = true;
       })
+    }
+
+    // Funcion nave arriba
+    moverArriba(){
+      this.model.position.y += 0.5;
+      if(this.model.position.y > 19){
+        this.model.position.y = 19;
+      }
+    }
+
+    // Funcion nave abajo
+    moverAbajo(){
+      this.model.position.y -= 0.5;
+      if(this.model.position.y < 1){
+        this.model.position.y = 1;
+      }
+    }
+
+    // Función para el cambio de suelo a techo
+    cambio(x,y,z){
+      // Creamos el camino por el que irá el objeto
+      // El true hace que el camino sea cerrado
+      this.camino1 = new THREE.CatmullRomCurve3(
+        [ new THREE.Vector3(x,y,z),
+            new THREE.Vector3(x+2.5,y+2.5,z),
+            new THREE.Vector3(x+5,y+5,z),
+            new THREE.Vector3(x+6.25,y+7.5,z),
+            new THREE.Vector3(x+7.5,y+10,z),
+            new THREE.Vector3(x+9.5,y+19,z)]
+      );
+
+      this.camino2 = new THREE.CatmullRomCurve3(
+        [new THREE.Vector3(x,y,z),
+          new THREE.Vector3(x+2.5,y-2.5,z),
+          new THREE.Vector3(x+5,y-5,z),
+          new THREE.Vector3(x+6.25,y-7.5,z),
+          new THREE.Vector3(x+7.5,y-10,z),
+          new THREE.Vector3(x+9.5,y-19,z)]
+      )
+
+      /*
+      // Dibujamos la línea
+      var geomLinea = new THREE.BufferGeometry();
+      geomLinea.setFromPoints(this.camino.getPoints(100));
+      var materialLinea = new THREE.LineBasicMaterial({color: 0x000000, linewidth : 4});
+      var lineaVisible = new THREE.Line(geomLinea,materialLinea);
+
+      this.add(lineaVisible);
+      */
+
+      // Hacemos la animación de saltar
+      var origen1 = {p: 0};
+      var dest1 = {p: 1};
+      var origen2 = {p: 0};
+      var dest2 = {p: 1};
+
+      if( cambioCirculo == true ){
+        var animacion = new TWEEN.Tween(origen1).to(dest1, 1000).onUpdate(()=>{
+          var pos = this.camino1.getPointAt(origen1.p);
+          this.model.position.copy(pos);
+          var tangente = this.camino1.getTangentAt(origen1.p);
+          pos.add(tangente);
+        });
+
+        // Empezamos la animacion
+        animacion.start();  
+
+        animacion.onComplete(() => {
+          cambioCirculo = false;
+        });
+      }
+      else{
+        var animacion2 = new TWEEN.Tween(origen2).to(dest2, 1000).onUpdate(()=>{
+          var pos = this.camino2.getPointAt(origen2.p);
+          this.model.position.copy(pos);
+          var tangente = this.camino2.getTangentAt(origen2.p);
+          pos.add(tangente);
+        });
+
+        // Empezamos la animacion
+        animacion2.start();  
+
+        animacion2.onComplete(() => {
+          cambioCirculo = true;
+        })
+      }   
     }
 
     // Función para reiniciar
     reseteaJuego(){
+      // Volvemos a tener un cubo
+      this.model.cambioCirculoCubo();
+
       // Al chocarte, devuelve el objeto a la posición inicial
       this.model.position.set(-300,1,0);
-      this.camera.position.set(-300,5,125);
+      this.camera.position.set(this.model.getPosX(),5,125);
+
       // Incrementamos los intentos
       this.attempts++;
+      
+      // Actualizamos los booleanos para los movimientos
+      saltoCubo = true;
+      saltoCirculo = false;
+      movNave = false;
     }
   }
   
@@ -720,8 +881,6 @@ $(function () {
   
   // Que no se nos olvide, la primera visualización.
   scene.update();
-
-
 
   // Métodos que ocurriran al pulsar teclas
   window.addEventListener( "keypress", (event) => scene.onKeyPress(event));
