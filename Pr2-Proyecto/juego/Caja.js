@@ -19,7 +19,9 @@ class Caja extends THREE.Object3D{
 
         this.createGeometriaNave();
         
-        this.createGeometriaRueda();
+        //this.createGeometriaRueda();
+
+        this.add(this.geometriaCubo);
 
         
     }
@@ -48,7 +50,7 @@ class Caja extends THREE.Object3D{
 
         this.geometriaCubo = csg.toMesh();
 
-        this.add(this.geometriaCubo);
+        
 
     }
 
@@ -123,7 +125,7 @@ class Caja extends THREE.Object3D{
         this.geometriaNave  = csg2.toMesh();
     }
 
-    createGeometriaRueda(){
+    /*createGeometriaRueda(){
         var material = new THREE.MeshNormalMaterial();
 
 
@@ -189,10 +191,10 @@ class Caja extends THREE.Object3D{
 
         //Creacion de los nodos BPS
         var csg3 = new CSG();
-        csg3.union([mesh, cono8]);
+        csg3.union([mesh]);
 
         this.geometriaRueda  = csg3.toMesh();
-    }
+    }*/
 
     cambioCajaNave(){
         this.remove(this.geometriaCubo);
@@ -201,7 +203,82 @@ class Caja extends THREE.Object3D{
 
     cambioNaveRueda(){
         this.remove(this.geometriaNave);
-        this.add(this.geometriaRueda);
+        var material = new THREE.MeshNormalMaterial();
+
+
+        const geometry = new THREE.RingGeometry( 0.1, 1, 8, 2 );
+        const mesh = new THREE.Mesh( geometry, material );
+        this.add(mesh);
+
+        var geometry2 = new THREE.ConeBufferGeometry(0.3, 0.7, 10);
+        var cono1 = new THREE.Mesh(geometry2, material);
+
+        cono1.translateX(0.5);
+        cono1.translateY(1.17);
+        cono1.translateZ(-0.1);
+        cono1.rotateZ(-23*Math.PI/180);
+        var cono2 = new THREE.Mesh(geometry2, material);
+
+        cono2.translateX(1.17);
+        cono2.translateY(0.5);
+        cono2.translateZ(-0.1);
+        cono2.rotateZ(-67*Math.PI/180);
+
+        var cono3 = new THREE.Mesh(geometry2, material);
+
+        cono3.translateX(1.17);
+        cono3.translateY(-0.5);
+        cono3.translateZ(-0.1);
+        cono3.rotateZ(-113*Math.PI/180);
+
+        var cono4 = new THREE.Mesh(geometry2, material);
+
+        cono4.translateX(0.5);
+        cono4.translateY(-1.17);
+        cono4.translateZ(-0.1);
+        cono4.rotateZ(-157*Math.PI/180);
+
+        var cono5 = new THREE.Mesh(geometry2, material);
+
+        cono5.translateX(-0.5);
+        cono5.translateY(-1.17);
+        cono5.translateZ(-0.1);
+        cono5.rotateZ(157*Math.PI/180);
+
+        var cono6 = new THREE.Mesh(geometry2, material);
+
+        cono6.translateX(-1.17);
+        cono6.translateY(-0.5);
+        cono6.translateZ(-0.1);
+        cono6.rotateZ(113*Math.PI/180);
+
+        var cono7 = new THREE.Mesh(geometry2, material);
+
+        cono7.translateX(-1.17);
+        cono7.translateY(0.5);
+        cono7.translateZ(-0.1);
+        cono7.rotateZ(67*Math.PI/180);
+
+        var cono8 = new THREE.Mesh(geometry2, material);
+
+        cono8.translateX(-0.5);
+        cono8.translateY(1.17);
+        cono8.translateZ(-0.1);
+        cono8.rotateZ(23*Math.PI/180);
+
+        // var csg = new CSG();
+        // csg.union([mesh, cono1]);
+
+        // this.add(csg.toMesh());
+        
+        this.add(cono1);
+        this.add(cono2);
+        this.add(cono3);
+        this.add(cono4);
+        this.add(cono5);
+        this.add(cono6);
+        this.add(cono7);
+        this.add(cono8);
     }
       
     update () {
