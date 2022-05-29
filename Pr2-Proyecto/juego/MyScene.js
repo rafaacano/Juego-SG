@@ -6,11 +6,12 @@ import { Stats } from '../libs/stats.module.js'
 import * as TWEEN from '../libs/tween.esm.js'
 
 import { Caja } from './Caja.js'
-
+import { Nave } from './Nave.js'
 
 // Variables
 var cubos = new Array;
 var pinchos = new Array;
+var salto = new Boolean(true);
 
 /// La clase fachada del modelo
 /**
@@ -21,7 +22,7 @@ var pinchos = new Array;
     static attempts = 0;
 
     // booleano para controlar la animacion
-    static salto = false;
+    
 
     constructor (myCanvas) {
       super();
@@ -58,7 +59,8 @@ var pinchos = new Array;
       // Por último creamos el modelo.
       // El modelo puede incluir su parte de la interfaz gráfica de usuario. Le pasamos la referencia a 
       // la gui y el texto bajo el que se agruparán los controles de la interfaz que añada el modelo.
-      this.model = new Caja(this.gui, "Controles de la Caja");
+      this.model = new Caja(this.gui, "Controles de la caja ");
+      //this.model = new Nave(this.gui, "Controles de la Caja");
       this.add (this.model);
       this.model.position.set(-300,1,0);
 
@@ -317,6 +319,17 @@ var pinchos = new Array;
       // Se actualiza la posición de la cámara según la posición del modelo
       this.camera.position.x = this.model.getPosX();
 
+      //Cambio de objeto del juego
+
+      if(this.model.getPosX() > -250 && this.model.getPosX() < -200){
+        this.model.cambioCajaNave();
+      }
+
+      if(this.model.getPosX() > -200){
+        this.model.cambioNaveRueda();
+      }
+      
+
       // Se actualiza el resto del modelo
       this.model.update();
       
@@ -343,9 +356,30 @@ var pinchos = new Array;
       var x = event.which;
 
       // Si pulsamos el espacio, saltamos
-      if( String.fromCharCode(x) == " " ){
+      if( (String.fromCharCode(x) == " ") && (salto == true) ){
         this.saltar(this.model.position.x,this.model.position.y,this.model.position.z);
         //alert("Espacio pulsado");
+      }
+      if( (String.fromCharCode(x) == "W") || (String.fromCharCode(x) == "w") ){
+        this.moverArriba();
+        
+      }
+      if( (String.fromCharCode(x) == "S") || (String.fromCharCode(x) == "s") ){
+         this.moverAbajo();
+      }
+    }
+
+    moverArriba(){
+      this.model.position.y += 0.5;
+      if(this.model.position.y > 24){
+        this.model.position.y = 24;
+      }
+    }
+
+    moverAbajo(){
+      this.model.position.y -= 0.5;
+      if(this.model.position.y < 1){
+        this.model.position.y = 1;
       }
     }
 
@@ -623,6 +657,8 @@ var pinchos = new Array;
     // Función para el salto de la caja
     saltar(x,y,z){
 
+      salto = false;
+
       // Creamos el camino por el que irá el objeto
       // El true hace que el camino sea cerrado
       this.camino = new THREE.CatmullRomCurve3(
@@ -653,11 +689,14 @@ var pinchos = new Array;
         this.model.position.copy(pos);
         var tangente = this.camino.getTangentAt(origen1.p);
         pos.add(tangente);
-        salto = true;
       });
 
       // Empezamos la animacion
       animacion.start();
+
+      animacion.onComplete(() => {
+        salto = true;
+      })
     }
 
     // Función para reiniciar
@@ -681,6 +720,8 @@ $(function () {
   
   // Que no se nos olvide, la primera visualización.
   scene.update();
+
+
 
   // Métodos que ocurriran al pulsar teclas
   window.addEventListener( "keypress", (event) => scene.onKeyPress(event));
