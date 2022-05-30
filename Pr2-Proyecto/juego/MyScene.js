@@ -6,6 +6,7 @@ import { Stats } from '../libs/stats.module.js'
 import * as TWEEN from '../libs/tween.esm.js'
 
 import { Caja } from './Caja.js'
+import { Nave } from './Nave.js'
 
 
 // Variables
@@ -15,6 +16,8 @@ var saltoCubo = new Boolean(true);
 var movNave = new Boolean(false);
 var saltoCirculo = new Boolean(false);
 var cambioCirculo = new Boolean(true);
+var animacionRuedaTerminada = new Boolean(true);
+var reajusteRueda = new Boolean(true);
 
 /// La clase fachada del modelo
 /**
@@ -61,6 +64,7 @@ var cambioCirculo = new Boolean(true);
       // El modelo puede incluir su parte de la interfaz gráfica de usuario. Le pasamos la referencia a 
       // la gui y el texto bajo el que se agruparán los controles de la interfaz que añada el modelo.
       this.model = new Caja(this.gui, "Controles de la Caja");
+      //this.model = new Nave(this.gui, "cointtoles")
       this.add (this.model);
       this.model.position.set(-300,1,0);
 
@@ -327,6 +331,10 @@ var cambioCirculo = new Boolean(true);
         this.model.cambioNaveRueda();
         movNave = false;
         saltoCirculo = true;
+        if(reajusteRueda == true){
+          this.model.position.set(168, 1, 0);
+          reajusteRueda = false;
+        }
       }
       /************************************************************/
 
@@ -336,7 +344,7 @@ var cambioCirculo = new Boolean(true);
       }
 
       // Se actualiza el resto del modelo
-      this.model.update();
+      this.model.update(saltoCirculo);
       
       // Le decimos al renderizador "visualiza la escena que te indico usando la cámara que te estoy pasando"
       this.renderer.render (this, this.getCamera());
@@ -372,7 +380,7 @@ var cambioCirculo = new Boolean(true);
          this.moverAbajo();
       }
       // Si pulsamos el espacio, saltamos
-      if( String.fromCharCode(x) == " " && saltoCirculo == true ){
+      if( String.fromCharCode(x) == " " && saltoCirculo == true && animacionRuedaTerminada == true){
         this.cambio(this.model.position.x,this.model.position.y,this.model.position.z);
       }
 
@@ -385,7 +393,7 @@ var cambioCirculo = new Boolean(true);
       if( x == 1 && saltoCubo == true ){
         this.saltar(this.model.position.x,this.model.position.y,this.model.position.z);
       }
-      else if( x == 1 && saltoCirculo == true){
+      else if( x == 1 && saltoCirculo == true && animacionRuedaTerminada == true){
         this.cambio(this.model.position.x,this.model.position.y,this.model.position.z);
 
       }
@@ -791,6 +799,9 @@ var cambioCirculo = new Boolean(true);
 
     // Función para el cambio de suelo a techo
     cambio(x,y,z){
+
+      //Mientras estemos dentro de esta funcion no podemos repetirla
+      animacionRuedaTerminada = false;
       // Creamos el camino por el que irá el objeto
       // El true hace que el camino sea cerrado
       this.camino1 = new THREE.CatmullRomCurve3(
@@ -840,6 +851,7 @@ var cambioCirculo = new Boolean(true);
 
         animacion.onComplete(() => {
           cambioCirculo = false;
+          animacionRuedaTerminada = true;
         });
       }
       else{
@@ -855,6 +867,7 @@ var cambioCirculo = new Boolean(true);
 
         animacion2.onComplete(() => {
           cambioCirculo = true;
+          animacionRuedaTerminada = true;    
         })
       }   
     }
@@ -862,7 +875,7 @@ var cambioCirculo = new Boolean(true);
     // Función para reiniciar
     reseteaJuego(){
       // Volvemos a tener un cubo
-      this.model.Reseteo(movNave,saltoCirculo);
+      this.model.Reseteo();
 
       // Al chocarte, devuelve el objeto a la posición inicial
       this.model.position.set(-300,1,0);

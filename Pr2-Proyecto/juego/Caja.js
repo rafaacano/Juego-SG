@@ -10,6 +10,8 @@ class Caja extends THREE.Object3D{
         // Se crea la parte de la interfaz que corresponde a la grapadora
         // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
         this.createGUI(gui,titleGui);
+
+        this.contador = 0;
         
         this.mat = new THREE.MeshPhongMaterial({color:0x000000});
 
@@ -107,83 +109,6 @@ class Caja extends THREE.Object3D{
         this.geometriaNave  = csg2.toMesh();
     }
 
-    /*
-    createGeometriaRueda(){
-        var geometry = new THREE.RingGeometry( 0.1, 1, 8, 2 );
-        var mesh = new THREE.Mesh( geometry, this.mat );
-
-        var geometry2 = new THREE.ConeBufferGeometry(0.3, 0.7, 10);
-        var cono1 = new THREE.Mesh(geometry2, this.mat);
-
-        cono1.translateX(0.5);
-        cono1.translateY(1.17);
-        cono1.translateZ(-0.1);
-        cono1.rotateZ(-23*Math.PI/180);
-
-        var cono2 = new THREE.Mesh(geometry2, this.mat);
-
-        cono2.translateX(1.17);
-        cono2.translateY(0.5);
-        cono2.translateZ(-0.1);
-        cono2.rotateZ(-67*Math.PI/180);
-
-        var this.cono3 = new THREE.Mesh(geometry2, this.mat);
-
-        this.cono3.translateX(1.17);
-        this.cono3.translateY(-0.5);
-        this.cono3.translateZ(-0.1);
-        this.cono3.rotateZ(-113*Math.PI/180);
-
-        this.this.cono4 = new THREE.Mesh(geometry2, this.mat);
-
-        this.cono4.translateX(0.5);
-        this.cono4.translateY(-1.17);
-        this.cono4.translateZ(-0.1);
-        this.cono4.rotateZ(-157*Math.PI/180);
-
-        var this.cono5 = new THREE.Mesh(geometry2, this.mat);
-
-        this.cono5.translateX(-0.5);
-        this.cono5.translateY(-1.17);
-        this.cono5.translateZ(-0.1);
-        this.cono5.rotateZ(157*Math.PI/180);
-
-        var this.cono6 = new THREE.Mesh(geometry2, this.mat);
-
-        this.cono6.translateX(-1.17);
-        this.cono6.translateY(-0.5);
-        this.cono6.translateZ(-0.1);
-        this.cono6.rotateZ(113*Math.PI/180);
-
-        var this.cono7 = new THREE.Mesh(geometry2, this.mat);
-
-        this.cono7.translateX(-1.17);
-        this.cono7.translateY(0.5);
-        this.cono7.translateZ(-0.1);
-        this.cono7.rotateZ(67*Math.PI/180);
-
-        var this.cono8 = new THREE.Mesh(geometry2, this.mat);
-
-        this.cono8.translateX(-0.5);
-        this.cono8.translateY(1.17);
-        this.cono8.translateZ(-0.1);
-        this.cono8.rotateZ(23*Math.PI/180);
-
-        //Creacion de los nodos BPS
-        var csg3 = new CSG();
-        csg3.union([mesh, this.cono8]);
-        csg3.union([cono1]);
-        csg3.union([cono2]);
-        csg3.union([this.cono3]);
-        csg3.union([this.cono4]);
-        csg3.union([this.cono5]);
-        csg3.union([this.cono6]);
-        csg3.union([this.cono7]);
-        
-        this.geometriaRueda  = csg3.toMesh();
-    }
-    */
-
     createGUI (gui,titleGui) {
 
     }
@@ -271,28 +196,20 @@ class Caja extends THREE.Object3D{
         this.add(this.cono8);
     }
 
-    Reseteo(movNave,saltoCirculo){
+    Reseteo(){
 
-        if( movNave ){
-            // Eliminamos la nave
-            this.remove(this.geometriaNave);
-        }
-
-        if( saltoCirculo ){
-            // Eliminamos todo
-            this.remove(this.mesh);
-            this.remove(this.cono1);
-            this.remove(this.cono2);
-            this.remove(this.cono3);
-            this.remove(this.cono4);
-            this.remove(this.cono5);
-            this.remove(this.cono6);
-            this.remove(this.cono7);
-            this.remove(this.cono8);
-        }
+        this.clear();
 
         // Añadimos el cubo
         this.add(this.geometriaCubo);
+
+        var aux = 36 - (this.contador % 36);
+
+        for(let i = 0; i < aux; i++){
+            this.rotateZ(-10*Math.PI/180);
+        }
+
+        this.contador = 0;
     }
 
     finJuego(){
@@ -310,13 +227,14 @@ class Caja extends THREE.Object3D{
 
     /*********************************************/
 
-    update( ) {
+    update(saltoCirculo) {
         // La caja se mueve constantemente en x un %
         this.position.x += 0.3;
 
         // Si somos el circulo, vamos rotando en -z
-        if( saltoCirculo ){
-            this.rotateZ(-Math.PI);
+        if( saltoCirculo == true ){
+            this.rotateZ(-10*Math.PI/180);
+            this.contador = this.contador + 1;
         }
     }
 
