@@ -211,6 +211,7 @@ class Caja extends THREE.Object3D{
         this.cono1.translateY(1.17);
         this.cono1.translateZ(-0.1);
         this.cono1.rotateZ(-23*Math.PI/180);
+
         this.cono2 = new THREE.Mesh(geometry2, material);
 
         this.cono2.translateX(1.17);
@@ -270,8 +271,33 @@ class Caja extends THREE.Object3D{
         this.add(this.cono8);
     }
 
-    cambioCirculoCubo(){
-        // Eliminamos todo el circulo
+    Reseteo(movNave,saltoCirculo){
+
+        if( movNave ){
+            // Eliminamos la nave
+            this.remove(this.geometriaNave);
+        }
+
+        if( saltoCirculo ){
+            // Eliminamos todo
+            this.remove(this.mesh);
+            this.remove(this.cono1);
+            this.remove(this.cono2);
+            this.remove(this.cono3);
+            this.remove(this.cono4);
+            this.remove(this.cono5);
+            this.remove(this.cono6);
+            this.remove(this.cono7);
+            this.remove(this.cono8);
+        }
+
+        // Añadimos el cubo
+        this.add(this.geometriaCubo);
+    }
+
+    finJuego(){
+        // Eliminamos el circulo
+        this.remove(this.mesh);
         this.remove(this.cono1);
         this.remove(this.cono2);
         this.remove(this.cono3);
@@ -280,15 +306,18 @@ class Caja extends THREE.Object3D{
         this.remove(this.cono6);
         this.remove(this.cono7);
         this.remove(this.cono8);
-        this.remove(this.mesh);
-        this.add(this.geometriaCubo);
     }
 
     /*********************************************/
 
-    update () {
+    update( ) {
         // La caja se mueve constantemente en x un %
         this.position.x += 0.3;
+
+        // Si somos el circulo, vamos rotando en -z
+        if( saltoCirculo ){
+            this.rotateZ(-Math.PI);
+        }
     }
 
     // Función para el salto de la caja

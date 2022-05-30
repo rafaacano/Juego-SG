@@ -22,7 +22,7 @@ var cambioCirculo = new Boolean(true);
  */
  class MyScene extends THREE.Scene {
     // Tendremos una variable que nos contará el número de intentos
-    static attempts = 0;
+    static attempts = 1;
 
     constructor (myCanvas) {
       super();
@@ -33,6 +33,7 @@ var cambioCirculo = new Boolean(true);
       // Añadimos el contador de intetos
       this.contador_intentos = document.getElementById("intentos");
       this.contador_intentos.innerHTML = MyScene.attempts;
+      $("#intentos").fadeIn(1000);
 
       this.gui = this.createGUI();
       
@@ -314,6 +315,7 @@ var cambioCirculo = new Boolean(true);
       // Se actualiza la posición de la cámara según la posición del modelo
       this.camera.position.x = this.model.getPosX();
 
+      /************************************************************/
       // Cambio de los objetos del juego
       if(this.model.getPosX() > -67 && this.model.getPosX() < 166){
         this.model.cambioCajaNave();
@@ -325,6 +327,12 @@ var cambioCirculo = new Boolean(true);
         this.model.cambioNaveRueda();
         movNave = false;
         saltoCirculo = true;
+      }
+      /************************************************************/
+
+      // Si llegamos a la posicion 350, hemos llegado al fin del juego
+      if( this.model.getPosX() > 350){
+        this.finJuego();
       }
 
       // Se actualiza el resto del modelo
@@ -854,19 +862,31 @@ var cambioCirculo = new Boolean(true);
     // Función para reiniciar
     reseteaJuego(){
       // Volvemos a tener un cubo
-      this.model.cambioCirculoCubo();
+      this.model.Reseteo(movNave,saltoCirculo);
 
       // Al chocarte, devuelve el objeto a la posición inicial
       this.model.position.set(-300,1,0);
       this.camera.position.set(this.model.getPosX(),5,125);
 
       // Incrementamos los intentos
-      this.attempts++;
+      MyScene.attempts++;
+      // Actualizamos su valor
+      this.contador_intentos.innerHTML = MyScene.attempts;
       
       // Actualizamos los booleanos para los movimientos
       saltoCubo = true;
       saltoCirculo = false;
       movNave = false;
+    }
+
+    finJuego(){
+      $("#fin").fadeIn(2000);
+      $("#imagenVidas").fadeIn(200);
+      $("#contadorIntentos").html(MyScene.attempts).fadeIn(3000);
+      $("#botonReiniciar").delay(4000).fadeIn(2000);
+      $("#botonFinal").delay(5000).fadeIn(2000);     
+      
+      this.model.finJuego();
     }
   }
   
