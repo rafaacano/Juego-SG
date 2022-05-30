@@ -880,13 +880,15 @@ var cambioCirculo = new Boolean(true);
     }
 
     finJuego(){
+      // Eliminamos el objeto
+      this.model.finJuego();
+    
+      // Hacemos aparecer los mensajes de final
       $("#fin").fadeIn(2000);
       $("#imagenVidas").fadeIn(200);
       $("#contadorIntentos").html(MyScene.attempts).fadeIn(3000);
       $("#botonReiniciar").delay(4000).fadeIn(2000);
       $("#botonFinal").delay(5000).fadeIn(2000);     
-      
-      this.model.finJuego();
     }
   }
   
