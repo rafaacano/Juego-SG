@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Crazy Cube</title>
+    <meta charset="utf-8">
+    <link rel="icon" href="../imgs/Icono.ico" />
+    <script type="text/javascript" src="../libs/jquery.js"></script>
+    <script type="module" src="MyScene.js"></script>    
+    
+    <style>
+        body{
+            margin: 0;
+            overflow: hidden; 
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Div which will show statistical information -->
+    <div id="Stats-output">
+    </div>
+
+    <!-- Div which will hold the Output -->
+    <div id="WebGL-output">
+    </div>
+
+    <!-- Contador de los intentos que se hacen en el juego -->
+    <div style="position: absolute; left:150px; top:10px; font-size: 3em; color:white; display: none;" id="intentos"></div>
+
+    <!-- Mensajes de final del juego -->
+    <div class="finalMessage" style="position: absolute; left: 30%; top: 20%; font-size: 5em; display: none;" id="fin">Gracias por jugar!</div>
+    <img src="../imgs/vidas.png" style="position: absolute; ;left:29%; top:47%; width: 80px; display: none;" id="imagenVidas"></img>
+    <div class="finalMessage" style="position: absolute; left: 35%; top: 47%; font-size: 3em; display: none;" id="contadorIntentos"></div>
+    <a href="juego.html" class="finalMessage" style="position: absolute; left: 47%; top: 63%; border: black 2px solid; border-radius: 10px; padding: 10px; text-decoration: none; display: none;" id="botonReiniciar">Volver a jugar</a>
+    <a href="index.html" class="finalMessage" style="position: absolute; left: 49%; top: 68%; border: black 2px solid; border-radius: 10px; padding: 10px; text-decoration: none; display: none;" id="botonFinal">Quit</a>
+
+</body>
+</html>
+
