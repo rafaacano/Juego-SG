@@ -5,9 +5,8 @@ import { TrackballControls } from '../libs/TrackballControls.js'
 import { Stats } from '../libs/stats.module.js'
 import * as TWEEN from '../libs/tween.esm.js'
 
-import { Caja } from './Caja.js'
+import { objetos } from './objetos.js'
 import { portal } from './portal.js'
-
 
 // Variables
 var cubos = new Array;
@@ -43,28 +42,22 @@ var reajusteRueda = new Boolean(true);
       this.initStats();
       
       // Construimos los distinos elementos que tendremos en la escena
-      this.crearObstaculos();
-      
-      // Todo elemento que se desee sea tenido en cuenta en el renderizado de la escena debe pertenecer a esta. Bien como hijo de la escena (this en esta clase) o como hijo de un elemento que ya esté en la escena.
-      // Tras crear cada elemento se añadirá a la escena con   this.add(variable)
       this.createLights ();
       
-      // Un suelo 
+      // Un suelo con sus obstáculos
       this.createGround ();
+      this.crearObstaculos();
       // Una pared
       this.createWall();
       // Un techo para el ultimo objeto
       this.createRoof();
       
       // Y unos ejes. Imprescindibles para orientarnos sobre dónde están las cosas
-      this.axis = new THREE.AxesHelper (8);
-      this.add (this.axis);
+      //this.axis = new THREE.AxesHelper (8);
+      //this.add (this.axis);
       
       // Por último creamos el modelo.
-      // El modelo puede incluir su parte de la interfaz gráfica de usuario. Le pasamos la referencia a 
-      // la gui y el texto bajo el que se agruparán los controles de la interfaz que añada el modelo.
-      this.model = new Caja(this.gui, "Controles de la Caja");
-      //this.model = new Nave(this.gui, "cointtoles")
+      this.model = new objetos();
       this.add (this.model);
       this.model.position.set(-300,1,0);
       
@@ -72,7 +65,7 @@ var reajusteRueda = new Boolean(true);
       this.portales = new portal();
       this.add(this.portales);
 
-      // Tendremos una cámara con un control de movimiento con el ratón
+      // Tendremos una cámara cque apunta al objeto
       this.createCamera ();
     }
     
@@ -333,7 +326,6 @@ var reajusteRueda = new Boolean(true);
 
       if(this.model.getPosX() > 167){
         this.model.cambioNaveRueda();
-        //this.model.position.y = 1;
         movNave = false;
         saltoCirculo = true;
         if(reajusteRueda == true){
@@ -494,9 +486,9 @@ var reajusteRueda = new Boolean(true);
       cubo11.position.set(-46,10,0);
       cubo12.position.set(-35,6,0);
       cubo13.position.set(-22,17,0);
-      cubo14.position.set(-10,3,0);
+      cubo14.position.set(-10,2,0);
       cubo15.position.set(2,8,0);
-      cubo16.position.set(26,17,0);
+      cubo16.position.set(26,19,0);
       cubo17.position.set(40,5,0);
       cubo18.position.set(44,6,0);
       cubo19.position.set(60,15,0);
@@ -647,15 +639,15 @@ var reajusteRueda = new Boolean(true);
       pincho16.position.set(296,20,0);
       pincho16.rotateX(Math.PI);
       cubo38.position.set(308,1,0);
-      pincho17.position.set(319,20,0);
-      pincho17.rotateX(Math.PI);
+      //pincho17.position.set(319,20,0);
+      //pincho17.rotateX(Math.PI);
       pincho18.position.set(330,1,0);
       pincho18.rotateY(Math.PI);
       cubo39.position.set(338,20,0);
       //pincho19.position.set(339.5,1,0);
       //cubo40.position.set(342,1,0);
-      pincho20.position.set(354,20,0);
-      pincho20.rotateX(Math.PI);
+      //pincho20.position.set(354,20,0);
+      //pincho20.rotateX(Math.PI);
 
       // Añadimos
       cubos.push(cubo31);
@@ -906,10 +898,7 @@ var reajusteRueda = new Boolean(true);
       movNave = false;
     }
 
-    finJuego(){
-      // Eliminamos el objeto
-      this.model.finJuego();
-    
+    finJuego(){   
       // Hacemos aparecer los mensajes de final
       $("#fin").fadeIn(2000);
       $("#imagenVidas").fadeIn(200);

@@ -6,7 +6,7 @@ class portal extends THREE.Object3D{
         super();
 
         // Creamos toroides para representar los portales
-        var geomToroide = new THREE.TorusGeometry(3,1,24,100);
+        var geomToroide = new THREE.TorusGeometry(4,0.5,24,100);
         var matToro = new THREE.MeshPhongMaterial({color:0x5c25fa});
 
         var portal1 = new THREE.Mesh(geomToroide,matToro);
@@ -20,7 +20,7 @@ class portal extends THREE.Object3D{
         portal1.rotateY(Math.PI/2);
         portal1.position.set(-66,6,0);
         portal2.rotateY(Math.PI/2);
-        portal2.position.set(167,5,0);
+        portal2.position.set(169,6,0);
     }
 
 
