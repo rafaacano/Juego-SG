@@ -20,7 +20,7 @@ class portal extends THREE.Object3D{
         portal1.rotateY(Math.PI/2);
         portal1.position.set(-66,6,0);
         portal2.rotateY(Math.PI/2);
-        portal2.position.set(169,6,0);
+        portal2.position.set(169,4,0);
     }
 
 
